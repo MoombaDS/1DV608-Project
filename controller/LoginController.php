@@ -20,7 +20,7 @@ class LoginController {
 			}
 			$password = $this->view->getRequestPassword();
 			if (empty($password)) {
-				$this->view->setPasswordMissingMessage();
+				$this->view->setPasswordMissingMessage($userName);
 				return;
 			}
 		} else {

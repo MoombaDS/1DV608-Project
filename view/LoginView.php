@@ -11,6 +11,7 @@ class LoginView {
 	private static $messageId = 'LoginView::Message';
 
 	private $message = '';
+	private $userName = '';
 
 	/**
 	 * Create HTTP response
@@ -52,7 +53,7 @@ class LoginView {
 					<p id="' . self::$messageId . '">' . $message . '</p>
 					
 					<label for="' . self::$name . '">Username :</label>
-					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="" />
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->userName . '" />
 
 					<label for="' . self::$password . '">Password :</label>
 					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
@@ -93,7 +94,8 @@ class LoginView {
 		$this->message = 'Username is missing';
 	}
 
-	public function setPasswordMissingMessage() {
+	public function setPasswordMissingMessage($username) {
+		$this->userName = $username;
 		$this->message = 'Password is missing';
 	}
 
