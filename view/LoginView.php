@@ -10,8 +10,13 @@ class LoginView {
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
 
+	private $loginModel;
 	private $message = '';
 	private $userName = '';
+
+	public function __construct(LoginModel $model) {
+		$this->loginModel = $model;
+	}
 
 	/**
 	 * Create HTTP response
@@ -21,8 +26,11 @@ class LoginView {
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response() {
+	if (!$this->loginModel->isLoggedIn()) {
 		$response = $this->generateLoginFormHTML($this->message);
-		//$response .= $this->generateLogoutButtonHTML($message);
+	} else {
+		$response = $this->generateLogoutButtonHTML($this->message);
+	}
 		return $response;
 	}
 
@@ -73,6 +81,13 @@ class LoginView {
 		}
 		return null;
 	}
+
+	public function getLogOut() {
+		if (isset($_POST[self::$logout])) {
+			return $_POST[self::$logout];
+		}
+		return null;
+	}
 	
 	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
 	public function getRequestUserName() {
@@ -102,6 +117,14 @@ class LoginView {
 	public function setWrongUserNameOrPasswordMessage($username) {
 		$this->userName = $username;
 		$this->message = 'Wrong name or password';
+	}
+
+	public function setWelcomeMessage() {
+		$this->message = 'Welcome';
+	}
+
+	public function setLogOutMessage() {
+		$this->message = 'Bye bye!';
 	}
 
 	public function clearMessage() {

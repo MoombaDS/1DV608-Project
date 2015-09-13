@@ -1,12 +1,37 @@
 <?php
 
 class LoginModel {
-	private $userName = "Admin";
-	private $password = "Password";
-	//private $loggedIn = false;
+	private static $loggedIn = 'LoginModel::LoggedIn';
+
+	private $user;
+
+	public function __construct() {
+		$this->user = new User('Admin', 'Password');
+		session_start();
+	}
 	
-	public function validateCredentials($userName, $password) {
-		return ($password == $this->password && $userName == $this->userName);
+	public function validateCredentialsAndLogIn(User $user) {
+		assert(!is_null($user));
+		$result = ($user->getUsername() == $this->user->getUsername() && $user->getPassword() == $this->user->getPassword());
+		if ($result) {
+			$_SESSION[self::$loggedIn] = true;
+		}
+		return $result;
+	}
+
+	public function isLoggedIn() {
+		if (isset($_SESSION[self::$loggedIn])) {
+			return $_SESSION[self::$loggedIn];
+		}
+		return false;
+	}
+
+	public function logOut() {
+		if (isset($_SESSION[self::$loggedIn]) && $_SESSION[self::$loggedIn]) {
+			$_SESSION[self::$loggedIn] = false;
+			return true;
+		}
+		return false;
 	}
 
 }
