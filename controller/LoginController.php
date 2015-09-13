@@ -23,6 +23,13 @@ class LoginController {
 				$this->view->setPasswordMissingMessage($userName);
 				return;
 			}
+
+			$result = $this->model->validateCredentials($userName, $password);
+
+			if (!$result) {
+				$this->view->setWrongUserNameOrPasswordMessage($userName);
+			}
+
 		} else {
 			$this->view->clearMessage();
 		}

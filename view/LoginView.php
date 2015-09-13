@@ -99,6 +99,11 @@ class LoginView {
 		$this->message = 'Password is missing';
 	}
 
+	public function setWrongUserNameOrPasswordMessage($username) {
+		$this->userName = $username;
+		$this->message = 'Wrong name or password';
+	}
+
 	public function clearMessage() {
 		$this->message = '';
 	}
