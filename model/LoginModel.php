@@ -6,9 +6,18 @@ class LoginModel {
 	private $user;
 
 	public function __construct() {
+		// Set up the hardcoded correct user for simplicity
 		$this->user = new User('Admin', 'Password');
+		// Start the session
 		session_start();
 	}
+
+	/**
+	 * Check if the provided user credentials are correct and set the session logged in variable to be true if they are
+	 * 
+	 * @param $user, the user to validate against stored credentials
+	 * @return true if credentials are valid, false if not
+	 */
 	
 	public function validateCredentialsAndLogIn(User $user) {
 		assert(!is_null($user));
@@ -19,6 +28,32 @@ class LoginModel {
 		return $result;
 	}
 
+	/**
+	 * Check if the provided user credentials from the cookies are correct and set the session logged in variable to be true if they are
+	 * 
+	 * @param $user, the user created from the cookie to validate against stored credentials
+	 * @return true if the credentials are valid, false if not
+	 */
+
+	public function validateCookieAndLogIn(User $user) {
+		assert (!is_null($user));
+		$result = ($user->getUsername() == $this->user->getUsername() && $this->verifyHashedPassword($this->user->getPassword(), $user->getPassword()));
+		if ($result) {
+			$_SESSION[self::$loggedIn] = true;
+		}
+		return $result;
+	}
+
+	private function verifyHashedPassword($password, $hashedPassword) {
+		return crypt($password, $hashedPassword) == $hashedPassword;
+	}
+
+	/**
+	 * Check the session information to decide if it's logged in
+	 * 
+	 * @return true if logged in, false if not
+	 */
+
 	public function isLoggedIn() {
 		if (isset($_SESSION[self::$loggedIn])) {
 			return $_SESSION[self::$loggedIn];
@@ -26,12 +61,25 @@ class LoginModel {
 		return false;
 	}
 
+	/**
+	 * Log out and set the session logged in variable to be false
+	 * 
+	 * @return true if successful logout, false if user was not logged in
+	 */
+
 	public function logOut() {
 		if (isset($_SESSION[self::$loggedIn]) && $_SESSION[self::$loggedIn]) {
 			$_SESSION[self::$loggedIn] = false;
 			return true;
 		}
 		return false;
+	}
+
+	public function generateHash($password) {
+    	if (defined("CRYPT_BLOWFISH") && CRYPT_BLOWFISH) {
+    	    $salt = '$2y$11$' . substr(md5(uniqid(rand(), true)), 0, 22);
+    	    return crypt($password, $salt);
+    	}
 	}
 
 }

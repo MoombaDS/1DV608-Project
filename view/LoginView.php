@@ -30,6 +30,11 @@ class LoginView {
 		$response = $this->generateLoginFormHTML($this->message);
 	} else {
 		$response = $this->generateLogoutButtonHTML($this->message);
+		if (isset($_POST[self::$keep]) && $_POST[self::$keep]) {
+			setcookie(self::$cookieName, $_POST[self::$name], time()+60*60*24*30);
+			$passHash = $this->loginModel->generateHash($_POST[self::$password]);
+			setcookie(self::$cookiePassword, $passHash, time()+60*60*24*30);
+		}
 	}
 		return $response;
 	}
@@ -75,12 +80,37 @@ class LoginView {
 		';
 	}
 
+	/**
+	 * Check for login attempt
+	 *
+	 * @return null if no attempt has been made, otherwise not null
+	 */
+
 	public function getLoginAttempt() {
 		if (isset($_POST[self::$login])) {
 			return $_POST[self::$login];
 		}
 		return null;
 	}
+
+	/**
+	 * Check for cookies
+	 *
+	 * @return null if no cookies exist, a Model/User containing the cookie information if they do
+	 */
+
+	public function getCookies() {
+		if (isset($_COOKIE[self::$cookieName])) {
+			return new User($_COOKIE[self::$cookieName], $_COOKIE[self::$cookiePassword]);
+		}
+		return null;
+	}
+
+	/**
+	 * Check for logout attempt
+	 *
+	 * @return null if no attempt has been made, otherwise not null
+	 */
 
 	public function getLogOut() {
 		if (isset($_POST[self::$logout])) {
@@ -89,14 +119,24 @@ class LoginView {
 		return null;
 	}
 	
-	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
+	/**
+	 * Get the username submitted by the user
+	 *
+	 * @return the username
+	 */
+
 	public function getRequestUserName() {
 		if (isset($_POST[self::$name])) {
 			return $_POST[self::$name];
 		}
 		return null;
-		//RETURN REQUEST VARIABLE: USERNAME
 	}
+
+	/**
+	 * Get the password submitted by the user
+	 *
+	 * @return the password
+	 */
 
 	public function getRequestPassword() {
 		if (isset($_POST[self::$password])) {
@@ -105,27 +145,95 @@ class LoginView {
 		return null;
 	}
 
+	/**
+	 * Set the message to reflect that username is missing
+	 *
+	 * @return null
+	 */
+
 	public function setUserNameMissingMessage() {
 		$this->message = 'Username is missing';
 	}
+
+	/**
+	 * Set the message to reflect that password is missing
+	 * 
+	 * @param $username, the username used in the attmept
+	 * @return null
+	 */
 
 	public function setPasswordMissingMessage($username) {
 		$this->userName = $username;
 		$this->message = 'Password is missing';
 	}
 
+	/**
+	 * Set the message to reflect that username or password was wrong
+	 * 
+	 * @param $username, the username used in the attmept
+	 * @return null
+	 */
+
 	public function setWrongUserNameOrPasswordMessage($username) {
 		$this->userName = $username;
 		$this->message = 'Wrong name or password';
 	}
 
+	/**
+	 * Welcome the user after a successful log in attempt
+	 * 
+	 * @return null
+	 */
+
 	public function setWelcomeMessage() {
-		$this->message = 'Welcome';
+		if (isset($_POST[self::$keep])) {
+			$this->message = 'Welcome and you will be remembered';
+		} else {
+			$this->message = 'Welcome';
+		}
 	}
 
-	public function setLogOutMessage() {
-		$this->message = 'Bye bye!';
+	/**
+	 * Welcome the user after a successful cookie log in
+	 * 
+	 * @return null
+	 */
+
+	public function setCookieWelcomeMessage() {
+		$this->message = 'Welcome back with cookie';
 	}
+
+	/**
+	 * Alert the user that their cookies were tampered with and remove said cookies
+	 * 
+	 * @return null
+	 */
+
+	public function setFailedCookieMessage() {
+		$this->message = 'Wrong information in cookies';
+		setcookie(self::$cookieName, "", time()-3600);
+		setcookie(self::$cookiePassword, "", time()-3600);
+	}
+
+	/**
+	 * Bid farewell to the user on log out and remove any cookies
+	 * 
+	 * @return null
+	 */
+
+	public function setLogOutMessageAndClearCookies() {
+		$this->message = 'Bye bye!';
+		if (isset($_COOKIE[self::$cookieName])) {
+			setcookie(self::$cookieName, "", time()-3600);
+			setcookie(self::$cookiePassword, "", time()-3600);
+		}
+	}
+
+	/**
+	 * Clear the message
+	 * 
+	 * @return null
+	 */
 
 	public function clearMessage() {
 		$this->message = '';
