@@ -32,8 +32,12 @@ class LoginView {
 		$response = $this->generateLogoutButtonHTML($this->message);
 		if (isset($_POST[self::$keep]) && $_POST[self::$keep]) {
 			setcookie(self::$cookieName, $_POST[self::$name], time()+60*60*24*30);
-			$passHash = $this->loginModel->generateHash($_POST[self::$password]);
-			setcookie(self::$cookiePassword, $passHash, time()+60*60*24*30);
+			$token = $this->loginModel->generateAndSaveToken($_POST[self::$name]);
+			setcookie(self::$cookiePassword, $token, time()+60*60*24*30);
+		} else if (isset($_COOKIE[self::$cookieName])) {
+			// If it was a successful login with cookies we want to generate a new cookie password
+			$token = $this->loginModel->generateAndSaveToken($_COOKIE[self::$cookieName]);
+			setcookie(self::$cookiePassword, $token, time()+60*60*24*30);
 		}
 	}
 		return $response;

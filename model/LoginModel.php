@@ -4,10 +4,12 @@ class LoginModel {
 	private static $loggedIn = 'LoginModel::LoggedIn';
 
 	private $user;
+	private $userDAL;
 
-	public function __construct() {
+	public function __construct(UserDAL $dal) {
 		// Set up the hardcoded correct user for simplicity
 		$this->user = new User('Admin', 'Password');
+		$this->userDAL = $dal;
 		// Start the session
 		session_start();
 	}
@@ -37,15 +39,22 @@ class LoginModel {
 
 	public function validateCookieAndLogIn(User $user) {
 		assert (!is_null($user));
-		$result = ($user->getUsername() == $this->user->getUsername() && $this->verifyHashedPassword($this->user->getPassword(), $user->getPassword()));
+		$storedUser = $this->userDAL->getUserWithToken();
+		
+		// If it's null there is no data and the cookie is probably tampered with
+		if (is_null($storedUser)) {
+			return false;
+		}
+
+		$result = ($user->getUsername() == $storedUser->getUsername() && $this->verifyHashedToken($user->getPassword(), $storedUser->getPassword()));
 		if ($result) {
 			$_SESSION[self::$loggedIn] = true;
 		}
 		return $result;
 	}
 
-	private function verifyHashedPassword($password, $hashedPassword) {
-		return crypt($password, $hashedPassword) == $hashedPassword;
+	private function verifyHashedToken($token, $hashedToken) {
+		return crypt($token, $hashedToken) == $hashedToken;
 	}
 
 	/**
@@ -75,10 +84,25 @@ class LoginModel {
 		return false;
 	}
 
-	public function generateHash($password) {
+	/**
+	 * Generate a login token for storing in cookies and also save a hashed version of this token
+	 * along with the username in a file for later reference.
+	 *
+	 * @return the randomly generated token for saving in cookies
+	 */
+
+	public function generateAndSaveToken($userName) {
+		$token = md5(uniqid(rand(), true));
+		$hashedToken = $this->generateHash($token);
+		$user = new User($userName, $hashedToken);
+		$this->userDAL->saveUserWithToken($user);
+		return $token;
+	}
+
+	private function generateHash($token) {
     	if (defined("CRYPT_BLOWFISH") && CRYPT_BLOWFISH) {
     	    $salt = '$2y$11$' . substr(md5(uniqid(rand(), true)), 0, 22);
-    	    return crypt($password, $salt);
+    	    return crypt($token, $salt);
     	}
 	}
 
