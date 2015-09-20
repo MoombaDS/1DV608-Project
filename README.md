@@ -1,2 +1,4 @@
-# Login_1DV608
-Interface repository for 1DV608 assignment 2 and 4
+# 1DV608 Assignment 2: Login
+Here you will find the source code for the php Login system created for Assignment 2 by Ioseff Griffith.
+
+A live demo can be found at: http://rm-audio.com/media/login/
