@@ -39,7 +39,7 @@ class LoginModel {
 
 	public function validateCookieAndLogIn(User $user) {
 		assert (!is_null($user));
-		$storedUser = $this->userDAL->getUserWithToken();
+		$storedUser = $this->userDAL->getUserWithToken($user);
 		
 		// If it's null there is no data and the cookie is probably tampered with
 		if (is_null($storedUser)) {
