@@ -3,7 +3,7 @@
 
 class LayoutView {
   
-  public function render($isLoggedIn, LoginView $v, DateTimeView $dtv) {
+  public function render($isLoggedIn, $isRegisterPage, View $v, DateTimeView $dtv) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -12,7 +12,7 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 2</h1>
-          ' . $this->renderIsLoggedIn($isLoggedIn) . '
+          ' . $this->renderSwitchPage($isLoggedIn, $isRegisterPage) . $this->renderIsLoggedIn($isLoggedIn) . '
           
           <div class="container">
               ' . $v->response() . '
@@ -32,4 +32,15 @@ class LayoutView {
       return '<h2>Not logged in</h2>';
     }
   }
+
+  private function renderSwitchPage($isLoggedIn, $registerPage) {
+    if (!$isLoggedIn) {
+      if ($registerPage) {
+        return '<a href="?">Back to login</a>';
+      } else {
+        return '<a href="?register">Register a new user</a>';
+      }
+    }
+  }
+
 }

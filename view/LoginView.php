@@ -1,6 +1,6 @@
 <?php
 
-class LoginView {
+class LoginView implements View {
 	private static $login = 'LoginView::Login';
 	private static $logout = 'LoginView::Logout';
 	private static $name = 'LoginView::UserName';
@@ -9,6 +9,13 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
+	private static $register = 'register';
+
+	private static $regMessage = 'RegisterView::Message';
+	private static $regUserName = 'RegisterView::UserName';
+	private static $regPassword = 'RegisterView::Password';
+	private static $regPasswordRep = 'RegisterView::PasswordRepeat';
+	private static $registerButton = 'RegisterView::Register';
 
 	private $loginModel;
 	private $message = '';
@@ -26,20 +33,20 @@ class LoginView {
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response() {
-	if (!$this->loginModel->isLoggedIn()) {
-		$response = $this->generateLoginFormHTML($this->message);
-	} else {
-		$response = $this->generateLogoutButtonHTML($this->message);
-		if (isset($_POST[self::$keep]) && $_POST[self::$keep]) {
-			setcookie(self::$cookieName, $_POST[self::$name], time()+60*60*24*30);
-			$token = $this->loginModel->generateAndSaveToken($_POST[self::$name]);
-			setcookie(self::$cookiePassword, $token, time()+60*60*24*30);
-		} else if (isset($_COOKIE[self::$cookieName])) {
-			// If it was a successful login with cookies we want to generate a new cookie password
-			$token = $this->loginModel->generateAndSaveToken($_COOKIE[self::$cookieName]);
-			setcookie(self::$cookiePassword, $token, time()+60*60*24*30);
+		if (!$this->loginModel->isLoggedIn()) {
+			$response = $this->generateLoginFormHTML($this->message);
+		} else {
+			$response = $this->generateLogoutButtonHTML($this->message);
+			if (isset($_POST[self::$keep]) && $_POST[self::$keep]) {
+				setcookie(self::$cookieName, $_POST[self::$name], time()+60*60*24*30);
+				$token = $this->loginModel->generateAndSaveToken($_POST[self::$name]);
+				setcookie(self::$cookiePassword, $token, time()+60*60*24*30);
+			} else if (isset($_COOKIE[self::$cookieName])) {
+				// If it was a successful login with cookies we want to generate a new cookie password
+				$token = $this->loginModel->generateAndSaveToken($_COOKIE[self::$cookieName]);
+				setcookie(self::$cookiePassword, $token, time()+60*60*24*30);
+			}
 		}
-	}
 		return $response;
 	}
 
@@ -241,6 +248,13 @@ class LoginView {
 
 	public function clearMessage() {
 		$this->message = '';
+	}
+
+	public function shouldMoveToRegisterPage() {
+		if (isset($_GET[self::$register])) {
+			return true;
+		}
+		return false;
 	}
 	
 }
