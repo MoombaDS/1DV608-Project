@@ -104,6 +104,19 @@ class RegisterView implements View {
 		$this->message .= 'Password has too few characters, at least 6 characters.<br />';
 	}
 
+	public function setNonMatchingPasswordMessage() {
+		$this->message .= 'Passwords do not match.<br />';
+	}
+
+	public function setUserExistsMessage() {
+		$this->message .= 'User exists, pick another username.<br />';
+	}
+
+	public function setInvalidCharactersMessage($userName) {
+		$this->message .= 'Username contains invalid characters.<br />';
+		$this->userName = $userName;
+	}
+
 	/**
 	 * Clear the message
 	 * 

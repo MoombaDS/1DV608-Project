@@ -19,7 +19,7 @@ ini_set('display_errors', 'On');
 //CREATE OBJECTS OF THE VIEWS
 $dal = new UserDAL();
 $model = new LoginModel($dal);
-$regModel = new RegisterModel();
+$regModel = new RegisterModel($dal);
 $v = new LoginView($model);
 $rv = new RegisterView($model, $regModel);
 $dtv = new DateTimeView();

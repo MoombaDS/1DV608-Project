@@ -240,6 +240,11 @@ class LoginView implements View {
 		}
 	}
 
+	public function setRegisteredMessage($userName) {
+		$this->message = 'Registered new user.';
+		$this->userName = $userName;
+	}
+
 	/**
 	 * Clear the message
 	 * 
@@ -255,6 +260,10 @@ class LoginView implements View {
 			return true;
 		}
 		return false;
+	}
+
+	public function moveToLogin() {
+		unset($_GET[self::$register]);
 	}
 	
 }

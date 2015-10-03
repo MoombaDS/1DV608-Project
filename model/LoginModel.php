@@ -7,7 +7,7 @@ class LoginModel {
 	private $userDAL;
 
 	public function __construct(UserDAL $dal) {
-		// Set up the hardcoded correct user for simplicity
+		// Set up the hardcoded admin user for simplicity
 		$this->user = new User('Admin', 'Password');
 		$this->userDAL = $dal;
 		// Start the session
@@ -23,7 +23,17 @@ class LoginModel {
 	
 	public function validateCredentialsAndLogIn(User $user) {
 		assert(!is_null($user));
-		$result = ($user->getUsername() == $this->user->getUsername() && $user->getPassword() == $this->user->getPassword());
+		$result = false;
+		if ($user->getUsername() == 'Admin') {
+			$result = ($user->getUsername() == $this->user->getUsername() && $user->getPassword() == $this->user->getPassword());
+		} else {
+			$savedUser = $this->userDAL->getRegisteredUser($user);
+			if (is_null($savedUser)) {
+				$result = false; // User did not exist
+			} else {
+				$result = ($user->getPassword() == $this->verifyHashedToken($user->getPassword(), $savedUser->getPassword()));
+			}
+		}
 		if ($result) {
 			$_SESSION[self::$loggedIn] = true;
 		}

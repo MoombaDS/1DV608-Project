@@ -107,10 +107,32 @@ class LoginController {
 			// TODO Check for illegal characters
 
 			$password = $this->regView->getRequestPassword();
+			$repeatPassword = $this->regView->getRequestRepeatPassword();
 			if (empty($password) || strlen($password) < 6) {
 				$this->regView->setTooShortPasswordMessage();
 				$canRegister = false;
+			} else {
+				// Check the repeated password
+				if (empty($repeatPassword) || $repeatPassword != $password) {
+					$this->regView->setNonMatchingPasswordMessage();
+					$canRegister = false;
+				} else if (!ctype_alnum($userName)) { // Check if it's alphanumeric
+					$userName = strip_tags($userName); // Strip any tags
+					$this->regView->setInvalidCharactersMessage($userName);
+					$canRegister = false;
+				}
 			}
+
+			if ($canRegister) { // If nothing has been triggered to stop a valid registration
+				$result = $this->regModel->registerUser(new User($userName, $password));
+				if (!$result) {
+					$this->regView->setUserExistsMessage();
+				} else {
+					$this->view->moveToLogin();
+					$this->view->setRegisteredMessage($userName);
+				}
+			}
+
 		}
 	}
 	

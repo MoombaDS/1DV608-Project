@@ -1,7 +1,9 @@
 <?php
 
 class UserDAL {
+	private static $filePath = 'UserData/'; // Filepath should ideally not be accessible to the server
 	private static $fileName = '_usercookie.data';
+	private static $loginFileName = '_userlogin.data';
 
 	/**
 	 * Load a User object from the file which contains the username and hashed token.
@@ -10,7 +12,7 @@ class UserDAL {
 	 */
 	public function getUserWithToken(User $user) {
 		try {
-			$fileContent = @file_get_contents($user->getUsername() . self::$fileName);
+			$fileContent = @file_get_contents(self::$filePath . $user->getUsername() . self::$fileName);
 		} catch (Exception $e) {
 			// No file found
 			return null;
@@ -30,6 +32,29 @@ class UserDAL {
 	public function saveUserWithToken(User $user) {
 		$content = serialize($user);
 
-		file_put_contents($user->getUsername() . self::$fileName, $content);
+		file_put_contents(self::$filePath . $user->getUsername() . self::$fileName, $content);
+	}
+
+	public function saveUserRegistration(User $user) {
+		if ($this->getRegisteredUser($user) != null) {
+			throw new Exception('Cannot register an existing username!');
+		} else {
+			$content = serialize($user);
+
+			file_put_contents(self::$filePath . $user->getUsername() . self::$loginFileName, $content);
+		}
+	}
+
+	public function getRegisteredUser(User $user) {
+		try {
+			$fileContent = @file_get_contents(self::$filePath . $user->getUsername() . self::$loginFileName);
+		} catch (Exception $e) {
+			// No file found
+			return null;
+		}
+		if ($fileContent !== FALSE) {
+			return unserialize($fileContent);
+		}
+		return null;
 	}
 }
