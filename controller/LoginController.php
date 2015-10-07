@@ -91,6 +91,12 @@ class LoginController {
 		}
 	}
 
+	/**
+	 * Check to see if a registration attempt has been made
+	 * 
+	 * @return null
+	 */
+
 	private function checkForRegisterAttempt() {
 		$registerAttempt = $this->regView->getRegisterAttempt();
 

@@ -255,12 +255,24 @@ class LoginView implements View {
 		$this->message = '';
 	}
 
+	/**
+	* Check if the user wishes to move to the registration page by checking the GET parameters.
+	*
+	* @return true if the GET paramater is set, false if not.
+	*/
+
 	public function shouldMoveToRegisterPage() {
 		if (isset($_GET[self::$register])) {
 			return true;
 		}
 		return false;
 	}
+
+	/**
+	* Unset the GET parameter and return the user to the login page.
+	*
+	* @return null
+	*/
 
 	public function moveToLogin() {
 		unset($_GET[self::$register]);

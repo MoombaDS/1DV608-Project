@@ -12,7 +12,7 @@ class RegisterView implements View {
 	private $message = '';
 	private $userName = '';
 
-		public function __construct(LoginModel $loginModel, RegisterModel $regModel) {
+	public function __construct(LoginModel $loginModel, RegisterModel $regModel) {
 		$this->loginModel = $loginModel;
 		$this->registerModel = $regModel;
 	}
@@ -74,6 +74,12 @@ class RegisterView implements View {
 		return null;
 	}
 
+	/**
+	* Check for the submitted username.
+	*
+	* @return null if no username was set, otherwise a string containing the username.
+	*/
+
 	public function getRequestUserName() {
 		if (isset($_POST[self::$regUserName])) {
 			$this->userName = $_POST[self::$regUserName];
@@ -82,12 +88,24 @@ class RegisterView implements View {
 		return null;
 	}
 
+	/**
+	* Check for the submitted password.
+	*
+	* @return null if no password was set, otherwise a string containing the password.
+	*/
+
 	public function getRequestPassword() {
 		if (isset($_POST[self::$regPassword])) {
 			return $_POST[self::$regPassword];
 		}
 		return null;
 	}
+
+	/**
+	* Check for the submitted repeat password.
+	*
+	* @return null if no repeat password was set, otherwise a string containing the repeat password.
+	*/
 
 	public function getRequestRepeatPassword() {
 		if (isset($_POST[self::$regPasswordRep])) {
@@ -96,21 +114,52 @@ class RegisterView implements View {
 		return null;
 	}
 
+	/**
+	* Sets the message to state that there are too few characters in the username.
+	*
+	* @return null
+	*/
+
 	public function setTooShortUsernameMessage() {
 		$this->message = 'Username has too few characters, at least 3 characters.<br />';
 	}
+
+	/**
+	* Sets the message to state that there are too few characters in the password.
+	*
+	* @return null
+	*/
 
 	public function setTooShortPasswordMessage() {
 		$this->message .= 'Password has too few characters, at least 6 characters.<br />';
 	}
 
+	/**
+	* Sets the message to state that the password and repeated password do not match.
+	*
+	* @return null
+	*/
+
 	public function setNonMatchingPasswordMessage() {
 		$this->message .= 'Passwords do not match.<br />';
 	}
 
+	/**
+	* Sets the message to state that the selected username is already taken.
+	*
+	* @return null
+	*/
+
 	public function setUserExistsMessage() {
 		$this->message .= 'User exists, pick another username.<br />';
 	}
+
+	/**
+	* Sets the message to state that there are invalid characters in the username.
+	*
+	* @param $userName the username with invalid characters or tags stripped from it.
+	* @return null
+	*/
 
 	public function setInvalidCharactersMessage($userName) {
 		$this->message .= 'Username contains invalid characters.<br />';

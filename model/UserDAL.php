@@ -35,6 +35,13 @@ class UserDAL {
 		file_put_contents(self::$filePath . $user->getUsername() . self::$fileName, $content);
 	}
 
+	/**
+	* Save the user registration into a file.
+	*
+	* @param $user the user to save.
+	* @return null
+	*/
+
 	public function saveUserRegistration(User $user) {
 		if ($this->getRegisteredUser($user) != null) {
 			throw new Exception('Cannot register an existing username!');
@@ -44,6 +51,13 @@ class UserDAL {
 			file_put_contents(self::$filePath . $user->getUsername() . self::$loginFileName, $content);
 		}
 	}
+
+	/**
+	* Check to see if the user with the specified username exists. If it does, return the details for the username.
+	*
+	* @param $user the user to search for.
+	* @return the credentials of the user found with the given username or null if no such user exists.
+	*/
 
 	public function getRegisteredUser(User $user) {
 		try {
