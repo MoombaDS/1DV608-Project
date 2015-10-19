@@ -7,9 +7,9 @@ Editor: Ioseff Griffith
 ### Supplementary specification
 
 * The system should respond to input in an acceptable timeframe.
-* The system should be user-friendly
-* System provides helpful error messages
-* System avoids unnecessary input
+* The system should be user-friendly.
+* System provides helpful error messages.
+* System avoids unnecessary input.
 * The system should follow web standards.
 
 # UC1 View landing page
@@ -39,11 +39,11 @@ A user is authenticated via the log in system.
 ## Alternate Scenarios
 
 4a. Information could not be validated.
-i. System presents an error message.
-ii. Step 2 in main scenario.
+* System presents an error message.
+* Step 2 in main scenario.
 6a. Information could not be validated.
-i. System presents an error message.
-ii. Step 4 in main scenario.
+* System presents an error message.
+* Step 4 in main scenario.
 
 # UC3 View quiz list
 
@@ -83,7 +83,7 @@ A user is authenticated via the log in system.
 ## Alternate Scenarios
 
 2a. User is the creator of the quiz.
-i. System displays a list of all quiz takers and their scores, plus an average score.
+* System displays a list of all quiz takers and their scores, plus an average score.
 
 # UC6 View user stats
 
@@ -99,4 +99,4 @@ i. System displays a list of all quiz takers and their scores, plus an average s
 ## Alternate Scenarios
 
 2a. User is logged in as the user being viewed.
-i. System displays a list of all quizzes created by the user, plus a list of all quizzes taken and their scores.
+* System displays a list of all quizzes created by the user, plus a list of all quizzes taken and their scores.
