@@ -11,7 +11,7 @@ class LayoutView {
           <title>Login Example</title>
         </head>
         <body>
-          <h1>Assignment 2</h1>
+          <h1>Quiz System</h1>
           ' . $this->renderSwitchPage($isLoggedIn, $isRegisterPage) . $this->renderIsLoggedIn($isLoggedIn) . '
           
           <div class="container">
