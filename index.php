@@ -11,6 +11,7 @@ require_once('vendor/model/LoginModel.php');
 require_once('vendor/model/User.php');
 require_once('vendor/model/UserDAL.php');
 require_once('vendor/model/RegisterModel.php');
+require_once('vendor/model/LoggedInUser.php');
 
 require_once('model/Question.php');
 require_once('model/Quiz.php');
@@ -20,8 +21,6 @@ require_once('model/UserStats.php');
 require_once('model/QuizModel.php');
 require_once('view/CreateView.php');
 require_once('controller/QuizController.php');
-
-$createString = "create";
 
 //MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
 error_reporting(E_ALL);
@@ -42,13 +41,8 @@ $quizModel = new QuizModel($quizDAL);
 $createView = new CreateView($quizModel, $dtv);
 $quizController = new QuizController($quizModel, $createView);
 
-if (isset($_GET[$createString])) {
-	if ($model->isLoggedIn()) {
-		$quizController->begin();
-	} else {
-		// If not logged in, redirect user to log in page
-		header('Location: /');
-	}
+if ($model->isLoggedIn()) {
+	$quizController->begin();
 } else {
 	$controller->begin();
 }

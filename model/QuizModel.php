@@ -8,7 +8,7 @@ class QuizModel {
 		$this->quizDAL = $quizDAL;
 	}
 
-	public function checkForQuizWithName($quizName) {
+	public function quizExistsWithName($quizName) {
 		if ($this->quizDAL->getQuiz($quizName) != NULL) {
 			return true;
 		}
@@ -19,6 +19,11 @@ class QuizModel {
 		assert(!is_null($quiz));
 		assert($quiz->validateQuiz()); // Just to make absolutely sure the quiz is correct
 		$this->quizDAL->saveQuiz($quiz);
+	}
+
+	public function getLoggedInUser() {
+		$user = $_SESSION[LoginModel::$sessionUserLocation];
+		return $user->getUserName();
 	}
 	
 }

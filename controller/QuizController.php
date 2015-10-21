@@ -12,6 +12,15 @@ class QuizController {
 	}
 
 	public function begin() {
-		$this->createView->render();
+		if ($this->createView->wantsToCreate()) {
+			$this->createView->render();
+
+			// Check to see if a valid quiz was created, if so save it
+			$completedQuiz = $this->createView->checkForCompletedQuiz();
+
+			if (!is_null($completedQuiz)) {
+				$this->model->saveQuiz($completedQuiz);
+			}
+		}
 	}
 }

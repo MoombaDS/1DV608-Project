@@ -2,6 +2,7 @@
 
 class LoginModel {
 	private static $loggedIn = 'LoginModel::LoggedIn';
+	public static $sessionUserLocation = "LoginModel::loggedInUser";
 
 	private $user;
 	private $userDAL;
@@ -36,6 +37,7 @@ class LoginModel {
 		}
 		if ($result) {
 			$_SESSION[self::$loggedIn] = true;
+			$_SESSION[self::$sessionUserLocation] = new loggedInUser($user->getUsername());
 		}
 		return $result;
 	}
@@ -59,6 +61,7 @@ class LoginModel {
 		$result = ($user->getUsername() == $storedUser->getUsername() && $this->verifyHashedToken($user->getPassword(), $storedUser->getPassword()));
 		if ($result) {
 			$_SESSION[self::$loggedIn] = true;
+			$_SESSION[self::$sessionUserLocation] = new loggedInUser($user->getUsername());
 		}
 		return $result;
 	}
@@ -89,6 +92,7 @@ class LoginModel {
 	public function logOut() {
 		if (isset($_SESSION[self::$loggedIn]) && $_SESSION[self::$loggedIn]) {
 			$_SESSION[self::$loggedIn] = false;
+			unset($_SESSION[self::$sessionUserLocation]);
 			return true;
 		}
 		return false;
