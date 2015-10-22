@@ -9,10 +9,18 @@ class QuizModel {
 	}
 
 	public function quizExistsWithName($quizName) {
-		if ($this->quizDAL->getQuiz($quizName) != NULL) {
+		if ($this->quizDAL->getQuiz($quizName) != null) {
 			return true;
 		}
 		return false;
+	}
+
+	public function getQuiz($quizName) {
+		return $this->quizDAL->getQuiz($quizName);
+	}
+
+	public function getQuizStats($quizName, $requestingUsername) {
+		return new QuizStats($quizName, $requestingUsername, $this->quizDAL);
 	}
 
 	public function saveQuiz(Quiz $quiz) {
@@ -21,9 +29,17 @@ class QuizModel {
 		$this->quizDAL->saveQuiz($quiz);
 	}
 
+	public function updateQuizStats(Result $result) {
+		$this->quizDAL->updateQuizStats($result);
+	}
+
 	public function getLoggedInUser() {
 		$user = $_SESSION[LoginModel::$sessionUserLocation];
-		return $user->getUserName();
+		return $user;
+	}
+
+	public function hasUserTakenQuiz($quizName, LoggedInUser $user) {
+		return $this->quizDAL->hasUserTakenQuiz($quizName, $user);
 	}
 	
 }

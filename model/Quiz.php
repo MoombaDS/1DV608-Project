@@ -15,7 +15,7 @@ class Quiz {
 			throw new Exception("Question count must exist!");
 		}
 		$this->name = $name;
-		$this->creator = $creator;
+		$this->creator = $creator->getUserName();
 		$this->questionCount = $questionCount;
 	}
 
