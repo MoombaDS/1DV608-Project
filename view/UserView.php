@@ -2,26 +2,16 @@
 
 class UserView {
 	private $quizModel;
-	private $dateTimeView;
 	private static $userViewString = 'user';
 	
-	public function __construct(QuizModel $quizModel, DateTimeView $dateTimeView) {
+	public function __construct(QuizModel $quizModel) {
 		assert(!is_null($quizModel));
-		assert(!is_null($dateTimeView));
 		$this->quizModel = $quizModel;
-		$this->dateTimeView = $dateTimeView;
 	}
 
 	public function render($userName) {
-		echo '<!DOCTYPE html>
-		      <html>
-		        <head>
-		          <meta charset="utf-8">
-		          ';
 		if ($this->quizModel->userStatsExistFor($userName)) {
-			echo '<title>' . $userName . ': Stats</title>
-		        </head>
-		        <body>
+			echo '
 		          <h1>' . $userName . ': Stats</h1>
 		          	<div class="container">
 		          	';
@@ -65,14 +55,11 @@ class UserView {
 		         </body>
 		      </html>';
 		} else {
-			echo '<title>No such user stats exist!</title>
-		        </head>
-		        <body>
+			echo '
 		          <h1>No such user stats exist!</h1>
 		          <div class="container">
 					<p>No stats could be found for user "' . $userName . '"...</p>
 					<p>Return to <a href="/">home</a>?</p>
-					' . $this->dateTimeView->show() . '
 		          </div>
 		         </body>
 		      </html>';

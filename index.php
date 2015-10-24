@@ -43,16 +43,15 @@ $controller = new LoginController($v, $rv, $lv, $dtv, $model, $regModel);
 
 $quizDAL = new QuizDAL();
 $quizModel = new QuizModel($quizDAL);
-$createView = new CreateView($quizModel, $dtv);
-$quizView = new QuizView($quizModel, $dtv);
-$UserView = new UserView($quizModel, $dtv);
-$quizListView = new QuizListView($quizModel, $v, $dtv);
+$createView = new CreateView($quizModel);
+$quizView = new QuizView($quizModel);
+$UserView = new UserView($quizModel);
+$quizListView = new QuizListView($quizModel);
 $quizController = new QuizController($quizModel, $createView, $quizView, $UserView, $quizListView);
 
+$controller->begin();
+
 if ($model->isLoggedIn()) {
-	$controller->begin();
 	$quizController->begin();
-} else {
-	$controller->begin();
 }
 

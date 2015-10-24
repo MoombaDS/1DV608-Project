@@ -48,6 +48,9 @@ class QuizModel {
 	}
 
 	public function updateQuizStats(Result $result) {
+		$user = new LoggedInUser($result->getUserName());
+		assert(!$this->userIsCreator($result->getQuizName(), $user));
+		assert(!$this->hasUserTakenQuiz($result->getQuizName(), $user));
 		$this->quizDAL->updateQuizStats($result);
 		$this->quizDAL->updateUserStats($result);
 	}
@@ -59,6 +62,11 @@ class QuizModel {
 
 	public function hasUserTakenQuiz($quizName, LoggedInUser $user) {
 		return $this->quizDAL->hasUserTakenQuiz($quizName, $user);
+	}
+
+	public function userIsCreator($quizName, LoggedInUser $user) {
+		$quiz = $this->quizDAL->getQuiz($quizName);
+		return (strcasecmp($user->getUserName(), $quiz->getCreator()) == 0);
 	}
 	
 }

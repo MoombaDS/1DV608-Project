@@ -2,29 +2,20 @@
 
 class QuizView {
 	private $quizModel;
-	private $dateTimeView;
 	private static $quizViewString = "quiz";
 	private static $startQuiz = "QuizView::Begin";
 	private static $submittedQuiz = "QuizView::Submit";
 	private static $question = "QuizView::Question_";
 	private static $answer = "QuizView::Answer_";
 	
-	public function __construct(QuizModel $quizModel, DateTimeView $dateTimeView) {
+	public function __construct(QuizModel $quizModel) {
 		assert(!is_null($quizModel));
-		assert(!is_null($dateTimeView));
 		$this->quizModel = $quizModel;
-		$this->dateTimeView = $dateTimeView;
 	}
 
 	public function render($quizName) {
 		if ($this->quizModel->quizExistsWithName($quizName)) {
-		    echo '<!DOCTYPE html>
-		      <html>
-		        <head>
-		          <meta charset="utf-8">
-		          <title>' . $quizName . '</title>
-		        </head>
-		        <body>
+		    echo '
 		          <h1>' . $quizName . '</h1>
 		          	';
 		    $quizStats = $this->quizModel->getQuizStats($quizName, $this->quizModel->getLoggedInUser());
@@ -44,30 +35,23 @@ class QuizView {
 		    	echo '</ul>';
 		    }
 
-		    if (!$this->quizModel->hasUserTakenQuiz($quizName, $this->quizModel->getLoggedInUser())) { // TODO add so creator can't take quiz
+		    if (!$this->quizModel->hasUserTakenQuiz($quizName, $this->quizModel->getLoggedInUser())
+		    	&& !$this->quizModel->userIsCreator($quizName, $this->quizModel->getLoggedInUser())) {
 		     	echo $this->generateBeginButtonHTML();
 		    }
 
 		    echo '
 		          <div class="container">
 		          <p>Return to <a href="/">home</a>?</p>
-		              ' . $this->dateTimeView->show() . '
 		          </div>
 		         </body>
 		      </html>
 		    ';
 		} else {
-		    echo '<!DOCTYPE html>
-		      <html>
-		        <head>
-		          <meta charset="utf-8">
-		          <title>No such quiz!</title>
-		        </head>
-		        <body>
+		    echo '
 		          <h1>No such quiz exists!</h1>
 		          <div class="container">
 		              <p>Return to <a href="/">home</a>?</p>
-		              ' . $this->dateTimeView->show() . '
 		          </div>
 		         </body>
 		      </html>
@@ -76,18 +60,9 @@ class QuizView {
 	}
 
 	public function renderQuizQuestions($quizName) {
-		echo '<!DOCTYPE html>
-	      <html>
-	        <head>
-	          <meta charset="utf-8">
-	          <title>' . $quizName . '</title>
-		        </head>
-		        <body>
+		echo '
 		          <h1>' . $quizName . '</h1>
 	          	' . $this->createQuizForm($quizName) . '
-	          <div class="container">
-	              ' . $this->dateTimeView->show() . '
-	          </div>
 	         </body>
 	      </html>
 	    ';
@@ -96,19 +71,10 @@ class QuizView {
 	public function renderScore(Result $result) {
 		$quizName = $this->requestingQuiz();
 		$quiz = $this->quizModel->getQuiz($quizName);
-		echo '<!DOCTYPE html>
-	      <html>
-	        <head>
-	          <meta charset="utf-8">
-	          <title>' . $quizName . '</title>
-		        </head>
-		        <body>
+		echo '
 		          <h1>' . $quizName . ': Results</h1>
 	          	<p>You scored: ' . $result->getScore() . ' out of ' . $quiz->getQuestionCount() . '</p>
 	          	<p>Return to <a href="/">home</a>?</p>
-	          <div class="container">
-	              ' . $this->dateTimeView->show() . '
-	          </div>
 	         </body>
 	      </html>
 	    ';

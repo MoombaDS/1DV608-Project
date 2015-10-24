@@ -63,14 +63,6 @@ class LoginView implements View {
 			</form>
 		';
 	}
-
-	public function getLogoutButtonHTML() {
-		return '
-			<form  method="post" >
-				<input type="submit" name="' . self::$logout . '" value="logout"/>
-			</form>
-		';
-	}
 	
 	/**
 	* Generate HTML code on the output buffer for the logout button
