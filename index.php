@@ -23,6 +23,8 @@ require_once('model/Result.php');
 require_once('model/QuizScorer.php');
 require_once('view/CreateView.php');
 require_once('view/QuizView.php');
+require_once('view/UserView.php');
+require_once('view/QuizListView.php');
 require_once('controller/QuizController.php');
 
 //MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
@@ -43,9 +45,12 @@ $quizDAL = new QuizDAL();
 $quizModel = new QuizModel($quizDAL);
 $createView = new CreateView($quizModel, $dtv);
 $quizView = new QuizView($quizModel, $dtv);
-$quizController = new QuizController($quizModel, $createView, $quizView);
+$UserView = new UserView($quizModel, $dtv);
+$quizListView = new QuizListView($quizModel, $v, $dtv);
+$quizController = new QuizController($quizModel, $createView, $quizView, $UserView, $quizListView);
 
 if ($model->isLoggedIn()) {
+	$controller->begin();
 	$quizController->begin();
 } else {
 	$controller->begin();

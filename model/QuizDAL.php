@@ -19,6 +19,56 @@ class QuizDAL {
 		return null;
 	}
 
+	public function getLatestXQuizzes($x) {
+		assert(is_integer($x));
+
+		// If x is -1 return all, else return the specified number;
+
+		$result = array();
+
+		// If the folder doesn't even exist we can assume there are none and just return the empty array
+		if (!file_exists(self::$quizFilePath)) {
+    		return $result;
+		}
+
+		$files = array();
+
+		foreach (scandir(self::$quizFilePath) as $file) {
+	    	if ($file[0] === '.') continue;
+	        $files[$file] = filemtime(self::$quizFilePath . '/' . $file);
+	    }
+
+	    arsort($files);
+	    $files = array_keys($files);
+
+	    $allQuizzes = array();
+
+	    foreach ($files as $file) {
+			try {
+				$fileContent = file_get_contents(self::$quizFilePath . '/' . $file);
+			} catch (Exception $e) {
+				// No file found
+				throw new Exception("No Such Quiz File Exists!");
+			}
+			if ($fileContent !== FALSE) {
+				$allQuizzes[] = unserialize($fileContent);
+			}
+	    }
+
+	    // If x is -1 return the $allQuizzes variable
+	    if ($x < 0) {
+	    	return $allQuizzes;
+	    } else {
+	    	for ($i = 0; $i < $x; $i++) {
+	    		if ($i >= count($allQuizzes)) {
+	    			break;
+	    		}
+	    		$result[] = $allQuizzes[$i];
+	    	}
+	    	return $result;
+	    }
+	}
+
 	public function saveQuiz(Quiz $quiz) {
 		if ($this->getQuiz($quiz->getName()) != NULL) {
 			throw new Exception('Cannot create a new Quiz with the same name as an existing quiz!');
@@ -74,6 +124,9 @@ class QuizDAL {
 	    	}
 	    } else {
 	    	for ($i = 0; $i < 5; $i++) {
+	    		if ($i >= count($files)) { // If there are fewer files than five we just break the cycle
+	    			break;
+	    		}
 	    		try {
 					$fileContent = file_get_contents(self::$quizStatFilePath . $quizName . '/' . $files[$i]);
 				} catch (Exception $e) {
@@ -88,11 +141,23 @@ class QuizDAL {
 	    return $result;
 	}
 
-	public function getStatsForUser($userName, LoggedInUser $requestUser) {
-
+	public function userStatsExistFor($userName) {
+		return file_exists(self::$userStatFilePath . $userName . '.userstats');
 	}
 
-	public function hasUserTakenQuiz($quizName, LoggedInuser $user) {
+	public function getStatsForUser(LoggedInUser $user) {
+		try {
+				$fileContent = file_get_contents(self::$userStatFilePath . $user->getUserName() . '.userStats');
+			} catch (Exception $e) {
+				// No file found
+				throw new Exception("No Such Quiz File Exists!");
+			}
+			if ($fileContent !== FALSE) {
+				return unserialize($fileContent);
+			}
+	}
+
+	public function hasUserTakenQuiz($quizName, LoggedInUser $user) {
 		assert(file_exists(self::$quizStatFilePath . $quizName));
 
 		$filesInFolder = scandir(self::$quizStatFilePath . $quizName);
@@ -115,7 +180,73 @@ class QuizDAL {
 
 	}
 
-	public function updateUserStats($result) {
+	public function updateUserCreationStats(Quiz $quiz) { // Should be refactored so this code is not duplicated
+		// First check for a user stat file (and related directory). If it doesn't exist we'll need to create it
+		if (!file_exists(self::$userStatFilePath)) {
+    		mkdir(self::$userStatFilePath, 0777, true);
+		}
 
+		if (!file_exists(self::$userStatFilePath . $quiz->getCreator() . '.userstats')) {
+			$user = new LoggedInUser($quiz->getCreator());
+			$userStats = new UserStats($user);
+
+			$userStats->addQuiz($quiz);
+
+			$content = serialize($userStats);
+
+			file_put_contents(self::$userStatFilePath . $quiz->getCreator() . '.userstats', $content);
+		} else {
+			// If it already exists, we just need to update the file
+			try {
+					$fileContent = file_get_contents(self::$userStatFilePath . $quiz->getCreator() . '.userStats');
+				} catch (Exception $e) {
+					// No file found
+					throw new Exception("No Such Quiz File Exists!");
+				}
+				if ($fileContent !== FALSE) {
+					$userStats = unserialize($fileContent);
+					$userStats->addQuiz($quiz);
+					$content = serialize($userStats);
+
+					file_put_contents(self::$userStatFilePath . $quiz->getCreator() . '.userstats', $content);
+				} else {
+					throw new Exception("Something went wrong!");
+				}
+		}
+	}
+
+	public function updateUserStats(Result $result) {
+		// First check for a user stat file (and related directory). If it doesn't exist we'll need to create it
+		if (!file_exists(self::$userStatFilePath)) {
+    		mkdir(self::$userStatFilePath, 0777, true);
+		}
+
+		if (!file_exists(self::$userStatFilePath . $result->getUserName() . '.userstats')) {
+			$user = new LoggedInUser($result->getUserName());
+			$userStats = new UserStats($user);
+
+			$userStats->addResult($result);
+
+			$content = serialize($userStats);
+
+			file_put_contents(self::$userStatFilePath . $result->getUserName() . '.userstats', $content);
+		} else {
+			// If it already exists, we just need to update the file
+			try {
+					$fileContent = file_get_contents(self::$userStatFilePath . $result->getUserName() . '.userStats');
+				} catch (Exception $e) {
+					// No file found
+					throw new Exception("No Such Quiz File Exists!");
+				}
+				if ($fileContent !== FALSE) {
+					$userStats = unserialize($fileContent);
+					$userStats->addResult($result);
+					$content = serialize($userStats);
+
+					file_put_contents(self::$userStatFilePath . $result->getUserName() . '.userstats', $content);
+				} else {
+					throw new Exception("Something went wrong!");
+				}
+		}
 	}
 }

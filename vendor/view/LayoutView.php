@@ -18,10 +18,12 @@ class LayoutView {
               ' . $v->response() . '
               
               ' . $dtv->show() . '
-          </div>
-         </body>
-      </html>
-    ';
+          </div>';
+    if (!$isLoggedIn) {
+      echo '</body>
+        </html>
+      ';
+    }
   }
   
   private function renderIsLoggedIn($isLoggedIn) {

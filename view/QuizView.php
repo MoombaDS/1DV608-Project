@@ -38,13 +38,13 @@ class QuizView {
 		    		<ul>
 		    	';
 		    	foreach ($quizStats->getAllQuizResults() as $result) {
-		    		echo '		<li>' . $result->getUserName() . ' scored ' . $result->getScore() . ' out of ' . $this->quizModel->getQuiz($quizName)->getQuestionCount() . '</li>
+		    		echo '		<li><a href ="/?user='. $result->getUserName() . '">' . $result->getUserName() . '</a> scored ' . $result->getScore() . ' out of ' . $this->quizModel->getQuiz($quizName)->getQuestionCount() . '</li>
 		    		';
 		    	}
 		    	echo '</ul>';
 		    }
 
-		    if (!$this->quizModel->hasUserTakenQuiz($quizName, $this->quizModel->getLoggedInUser())) {
+		    if (!$this->quizModel->hasUserTakenQuiz($quizName, $this->quizModel->getLoggedInUser())) { // TODO add so creator can't take quiz
 		     	echo $this->generateBeginButtonHTML();
 		    }
 

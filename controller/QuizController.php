@@ -4,14 +4,20 @@ class QuizController {
 	private $model;
 	private $createView;
 	private $quizView;
+	private $userView;
+	private $quizListView;
 	
-	public function __construct(QuizModel $model, CreateView $createView, QuizView $quizView) {
+	public function __construct(QuizModel $model, CreateView $createView, QuizView $quizView, UserView $userView, QuizListView $quizListView) {
 		assert(!is_null($model));
 		assert(!is_null($createView));
 		assert(!is_null($quizView));
+		assert(!is_null($userView));
+		assert(!is_null($quizListView));
 		$this->model = $model;
 		$this->createView = $createView;
 		$this->quizView = $quizView;
+		$this->userView = $userView;
+		$this->quizListView = $quizListView;
 	}
 
 	public function begin() {
@@ -43,6 +49,12 @@ class QuizController {
 			$this->quizView->renderQuizQuestions($this->quizView->requestingQuiz());
 		} else if ($this->quizView->requestingQuiz() != null) {
 			$this->quizView->render($this->quizView->requestingQuiz());
+		} else if ($this->userView->requestingUser() != null) {
+			$this->userView->render($this->userView->requestingUser());
+		} else if ($this->quizListView->wantsList()) {
+			$this->quizListView->render();
+		} else {
+			$this->quizListView->renderLanding();
 		}
 	}
 }

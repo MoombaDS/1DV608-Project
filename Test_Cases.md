@@ -92,7 +92,7 @@ When the user has logged in, the landing page should be shown.
 * Submit the form.
 
 ### Output:
-* The system displays the status page for the newly created quiz.
+* The system displays a link to the status page for the newly created quiz.
 
 # Test Case 2.9, Trying to create quiz while not logged in should fail
 
@@ -152,8 +152,6 @@ When the user has logged in, the landing page should be shown.
 
 ### Output:
 * The text "Your score was: " followed by the user's score should be displayed.
-* The questions and user's answers should be displayed.
-* Answers that were incorrect should be marked with the correct answer displayed.
 * The score should be saved on user stats and quiz stats.
 
 # Test Case 5.1, Show quiz stats when quiz wasn't created by logged in user.
@@ -172,7 +170,6 @@ When the user has logged in, the landing page should be shown.
 
 ### Output:
 * A list of all users who have taken the quiz along with their scores should be displayed in order with the most recent user first.
-* An average score should be shown.
 
 # Test Case 5.3, Showing quiz stats for non-existent quiz should fail
 
