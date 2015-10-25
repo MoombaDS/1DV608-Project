@@ -1,5 +1,10 @@
 <?php
 
+/**
+* A view class for displaying the list of quizzes and the landing page.
+*
+**/
+
 class QuizListView {
 	private $quizModel;
 	private static $quizListViewString = 'list';
@@ -8,6 +13,11 @@ class QuizListView {
 		assert(!is_null($quizModel));
 		$this->quizModel = $quizModel;
 	}
+
+	/**
+	* Renders the landing page.
+	* @return null but writes to standard output.
+	**/
 
 	public function renderLanding() {
 		echo '
@@ -18,12 +28,12 @@ class QuizListView {
 
 		if (count($latestFiveQuizzes) > 0) {
 			foreach ($latestFiveQuizzes as $quiz) {
-				echo '<li><a href="/?quiz=' . $quiz->getName() . '">' . $quiz->getName() . '</a> by <a href="/?user=' . $quiz->getCreator() . '">' . $quiz->getCreator() . '</a></li>
+				echo '<li><a href="?quiz=' . $quiz->getName() . '">' . $quiz->getName() . '</a> by <a href="?user=' . $quiz->getCreator() . '">' . $quiz->getCreator() . '</a></li>
 					';
 			}
 			echo '</ul>
 				  <div class="container">
-					<p><a href="/?list">View all quizzes</a></p>';
+					<p><a href="?list">View all quizzes</a></p>';
 		} else {
 			echo '<li>No quizzes yet...</li>
 				</ul>
@@ -31,12 +41,17 @@ class QuizListView {
 		}
 
 		echo '
-					<p><a href="/?create">Create new quiz</a></p>
+					<p><a href="?create">Create new quiz</a></p>
 		          </div>
 		         </body>
 		      </html>
 		    ';
 	}
+
+	/**
+	* Renders the full quiz list.
+	* @return null but writes to standard output.
+	**/
 
 	public function render() {
 		echo '
@@ -49,7 +64,7 @@ class QuizListView {
 
 		if (count($fullQuizList) > 0) {
 			foreach ($fullQuizList as $quiz) {
-				echo '<li><a href="/?quiz=' . $quiz->getName() . '">' . $quiz->getName() . '</a> by <a href="/?user=' . $quiz->getCreator() . '">' . $quiz->getCreator() . '</a></li>
+				echo '<li><a href="?quiz=' . $quiz->getName() . '">' . $quiz->getName() . '</a> by <a href="?user=' . $quiz->getCreator() . '">' . $quiz->getCreator() . '</a></li>
 					';
 			}
 		} else {
@@ -64,6 +79,11 @@ class QuizListView {
 		      </html>
 		    ';
 	}
+
+	/**
+	* Check to see if the user has requested the quiz list by looking at the GET values.
+	* @return true if the user wants the list, false otherwise.
+	**/
 
 	public function wantsList() {
 		if (isset($_GET[self::$quizListViewString])) {

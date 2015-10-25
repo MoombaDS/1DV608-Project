@@ -1,5 +1,10 @@
 <?php
 
+/**
+* A class designed to represent results within the system/
+*
+**/
+
 class Result {
 
 	private $userName;

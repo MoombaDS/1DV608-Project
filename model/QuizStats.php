@@ -1,9 +1,17 @@
 <?php
 
+/**
+* A class designed for representing quiz stats.
+*
+**/
+
 class QuizStats {
 
 	private $quizName;
 	private $quizDAL;
+	/**
+	* An array containg all Result obejcts associated with the current quiz.
+	**/
 	private $resultList = Array();
 
 	public function __construct($quizName, LoggedInuser $requestingUser, $quizDAL) {
@@ -13,6 +21,7 @@ class QuizStats {
 		$this->quizName = $quizName;
 		$this->quizDAL = $quizDAL;
 
+		// Call the DAL in order to construct the stats for the quiz.
 		$this->resultList = $this->quizDAL->getStatsForQuiz($quizName, $requestingUser);
 	}
 

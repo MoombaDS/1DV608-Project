@@ -1,5 +1,10 @@
 <?php
 
+/**
+* Controller class which handles passing any information to the model to be saved and deciding which view needs to be rendered.
+*
+**/
+
 class QuizController {
 	private $model;
 	private $createView;
@@ -20,6 +25,11 @@ class QuizController {
 		$this->quizListView = $quizListView;
 	}
 
+	/**
+	* Core function of the controller. Decides which view to render by asking the views in question.
+	* @return null
+	**/
+
 	public function begin() {
 		if ($this->createView->wantsToCreate()) {
 			$this->createView->render();
@@ -30,7 +40,7 @@ class QuizController {
 			if (!is_null($completedQuiz)) {
 				$this->model->saveQuiz($completedQuiz);
 			}
-		} else if ($this->quizView->submittedQuiz()) {
+		} else if ($this->quizView->submittedQuiz()) { // If the user has submitted answers for a quiz
 			$scorer = new QuizScorer();
 			$answers = $this->quizView->getAnswers();
 			$result = $scorer->scoreQuiz($this->model->getQuiz($this->quizView->requestingQuiz()), $this->model->getLoggedInUser(), $answers);
@@ -40,20 +50,19 @@ class QuizController {
 			if (!$this->model->hasUserTakenQuiz($this->quizView->requestingQuiz(), $this->model->getLoggedInUser())) {
 				// Save results for both user and quiz
 				$this->model->updateQuizStats($result);
-				// TODO save results for the user
 			}
 
 			$this->quizView->renderScore($result);
 
-		} else if ($this->quizView->startedQuiz()) {
+		} else if ($this->quizView->startedQuiz()) { // If the user has elected to start a quiz
 			$this->quizView->renderQuizQuestions($this->quizView->requestingQuiz());
-		} else if ($this->quizView->requestingQuiz() != null) {
+		} else if ($this->quizView->requestingQuiz() != null) { // If the user is requesting to view the stat page for a quiz
 			$this->quizView->render($this->quizView->requestingQuiz());
-		} else if ($this->userView->requestingUser() != null) {
+		} else if ($this->userView->requestingUser() != null) { // If the user is requesting to view a user page
 			$this->userView->render($this->userView->requestingUser());
-		} else if ($this->quizListView->wantsList()) {
+		} else if ($this->quizListView->wantsList()) { // If the user is requesting the full quiz list
 			$this->quizListView->render();
-		} else {
+		} else { // Otherwise we just show the landing page
 			$this->quizListView->renderLanding();
 		}
 	}

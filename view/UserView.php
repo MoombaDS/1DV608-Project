@@ -1,5 +1,10 @@
 <?php
 
+/**
+* A view class for displaying user stats.
+*
+**/
+
 class UserView {
 	private $quizModel;
 	private static $userViewString = 'user';
@@ -8,6 +13,12 @@ class UserView {
 		assert(!is_null($quizModel));
 		$this->quizModel = $quizModel;
 	}
+
+	/**
+	* Render the user page for the given user.
+	* @param $userName the username of the user in question.
+	* @return null but writes to standard output.
+	**/
 
 	public function render($userName) {
 		if ($this->quizModel->userStatsExistFor($userName)) {
@@ -26,7 +37,7 @@ class UserView {
 		    	';
 		    	for ($i = count($quizResults) - 1; $i >= 0; $i--) {
 		    		echo '
-		    		<li>Scored ' . $quizResults[$i]->getScore() . ' out of ' . $this->quizModel->getQuiz($quizResults[$i]->getQuizName())->getQuestionCount() . ' on <a href="/?quiz=' . $quizResults[$i]->getQuizName() . '">' . $quizResults[$i]->getQuizName() . '</a></li>
+		    		<li>Scored ' . $quizResults[$i]->getScore() . ' out of ' . $this->quizModel->getQuiz($quizResults[$i]->getQuizName())->getQuestionCount() . ' on <a href="?quiz=' . $quizResults[$i]->getQuizName() . '">' . $quizResults[$i]->getQuizName() . '</a></li>
 		    		';
 		    	}
 		    	echo '</ul>';
@@ -45,13 +56,14 @@ class UserView {
 		    		<ul>';
 		    	for ($i = count($quizzesCreated) - 1; $i >= 0; $i--) {
 		    		echo '
-		    			<li><a href="/?quiz=' . $quizzesCreated[$i] . '">' . $quizzesCreated[$i] . '</a></li>';
+		    			<li><a href="?quiz=' . $quizzesCreated[$i] . '">' . $quizzesCreated[$i] . '</a></li>';
 		    	}
 		    	echo '
 		    		</ul>';
 		    }
 
-		    echo '</div>
+		    echo '<p>Return to <a href="?">home</a>?</p>
+		    		</div>
 		         </body>
 		      </html>';
 		} else {
@@ -59,12 +71,17 @@ class UserView {
 		          <h1>No such user stats exist!</h1>
 		          <div class="container">
 					<p>No stats could be found for user "' . $userName . '"...</p>
-					<p>Return to <a href="/">home</a>?</p>
+					<p>Return to <a href="?">home</a>?</p>
 		          </div>
 		         </body>
 		      </html>';
 		}
 	}
+
+	/**
+	* Check to see if a user page is being requested by looking at the GET values.
+	* @return the userName of the user being requested or null if no user is being requested.
+	**/
 
 	public function requestingUser() {
 		if (isset($_GET[self::$userViewString])) {

@@ -1,10 +1,26 @@
 <?php
 
+/**
+* A data access layer for storing and retrieving all data related to quizzes. With more time and access to databases, this would likely be
+* implemented through the use of databases such as MySQL. However, lacking these things, it is instead implemented using files.
+*
+* File paths should ideally be located outside the hierarchy accessible through the server.
+*
+* Methods should preferably be accessed via the QuizModel which acts as a facade of sorts.
+**/
+
 class QuizDAL {
 	private static $quizFilePath = "Quizzes/";
 	private static $quizStatFilePath = "QuizStats/";
 	private static $userStatFilePath = "UserStats/";
+	private static $userStatSuffix = ".userstats";
 	private static $separator = '_';
+
+	/**
+	* Retreive the quiz with the specified name.
+	* @param $quizName the name of the requested quiz.
+	* @return the Quiz object or null if it does not exist.
+	**/
 
 	public function getQuiz($quizName) {
 		try {
@@ -18,6 +34,12 @@ class QuizDAL {
 		}
 		return null;
 	}
+
+	/**
+	* Retreive a list of the latest x quizzes in sorted order, with newest quizzes first.
+	* @param $x the number of quizzes to retreive. -1 will retreive all quizzes.
+	* @return a sorted array of Quiz objects with newest quizzes first.
+	**/
 
 	public function getLatestXQuizzes($x) {
 		assert(is_integer($x));
@@ -69,6 +91,13 @@ class QuizDAL {
 	    }
 	}
 
+	/**
+	* Save a newly created quiz so it can be accessed by others.
+	* @param $quiz the valid Quiz object to be saved.
+	* @throws an Exception if attempting to create a quiz when a quiz with that name already exists.
+	* @return null
+	**/
+
 	public function saveQuiz(Quiz $quiz) {
 		if ($this->getQuiz($quiz->getName()) != NULL) {
 			throw new Exception('Cannot create a new Quiz with the same name as an existing quiz!');
@@ -91,6 +120,14 @@ class QuizDAL {
 			}
 		}
 	}
+
+	/**
+	* Retreives the stats for a given quiz.
+	* @param $quizName the name of the quiz.
+	* @param $requestUser a LoggedInUser object representing the user making the request.
+	* @return an array of Result objects. If the user is the creator of the quiz, then all results will be returned.
+	* If not, then only the most recent five will be returned.
+	**/
 
 	public function getStatsForQuiz($quizName, LoggedInUser $requestUser) {
 		assert(file_exists(self::$quizStatFilePath . $quizName));
@@ -141,13 +178,25 @@ class QuizDAL {
 	    return $result;
 	}
 
+	/**
+	* Check to see if user stats exist for the specified username.
+	* @param $userName the user to check for.
+	* @return true if a stat file exists, false if not.
+	**/
+
 	public function userStatsExistFor($userName) {
-		return file_exists(self::$userStatFilePath . $userName . '.userstats');
+		return file_exists(self::$userStatFilePath . $userName . self::$userStatSuffix);
 	}
+
+	/**
+	* Method to retreive the stats for a given user.
+	* @param $user a LoggedInUser object representing the user for which stats have been requested.
+	* @return the UserStats object for the requested user.
+	**/
 
 	public function getStatsForUser(LoggedInUser $user) {
 		try {
-				$fileContent = file_get_contents(self::$userStatFilePath . $user->getUserName() . '.userStats');
+				$fileContent = file_get_contents(self::$userStatFilePath . $user->getUserName() . self::$userStatSuffix);
 			} catch (Exception $e) {
 				// No file found
 				throw new Exception("No Such Quiz File Exists!");
@@ -156,6 +205,13 @@ class QuizDAL {
 				return unserialize($fileContent);
 			}
 	}
+
+	/**
+	* Check to see if a user has taken a given quiz.
+	* @param $quizName the quiz in question.
+	* @param $user a LoggedInUser object representing the user in question.
+	* @return true if the user has taken the quiz, false otherwise.
+	**/
 
 	public function hasUserTakenQuiz($quizName, LoggedInUser $user) {
 		assert(file_exists(self::$quizStatFilePath . $quizName));
@@ -172,13 +228,25 @@ class QuizDAL {
 		return false;
 	}
 
+	/**
+	* A function to update stats for a quiz based on a Result object.
+	* @param $result a Result object representing a set of quiz results.
+	* @return null.
+	**/
+
 	public function updateQuizStats(Result $result) {
 		// Make sure the quiz actually exists
 		assert(file_exists(self::$quizStatFilePath . $result->getQuizName()));
 		$content = serialize($result);
-		file_put_contents(self::$quizStatFilePath . $result->getQuizName() . '/' . $result->getUserName() . self::$separator . $result->getQuizName() . '.quizstats', $content);
+		file_put_contents(self::$quizStatFilePath . $result->getQuizName() . '/' . $result->getUserName() . self::$separator . $result->getQuizName() . self::$userStatSuffix, $content);
 
 	}
+
+	/**
+	* A function for updating user stats with their newly created quizzes.
+	* @param $quiz the newly created Quiz Object.
+	* @return null.
+	**/
 
 	public function updateUserCreationStats(Quiz $quiz) { // Should be refactored so this code is not duplicated
 		// First check for a user stat file (and related directory). If it doesn't exist we'll need to create it
@@ -186,7 +254,7 @@ class QuizDAL {
     		mkdir(self::$userStatFilePath, 0777, true);
 		}
 
-		if (!file_exists(self::$userStatFilePath . $quiz->getCreator() . '.userstats')) {
+		if (!file_exists(self::$userStatFilePath . $quiz->getCreator() . self::$userStatSuffix)) {
 			$user = new LoggedInUser($quiz->getCreator());
 			$userStats = new UserStats($user);
 
@@ -194,11 +262,11 @@ class QuizDAL {
 
 			$content = serialize($userStats);
 
-			file_put_contents(self::$userStatFilePath . $quiz->getCreator() . '.userstats', $content);
+			file_put_contents(self::$userStatFilePath . $quiz->getCreator() . self::$userStatSuffix, $content);
 		} else {
 			// If it already exists, we just need to update the file
 			try {
-					$fileContent = file_get_contents(self::$userStatFilePath . $quiz->getCreator() . '.userStats');
+					$fileContent = file_get_contents(self::$userStatFilePath . $quiz->getCreator() . self::$userStatSuffix);
 				} catch (Exception $e) {
 					// No file found
 					throw new Exception("No Such Quiz File Exists!");
@@ -208,12 +276,18 @@ class QuizDAL {
 					$userStats->addQuiz($quiz);
 					$content = serialize($userStats);
 
-					file_put_contents(self::$userStatFilePath . $quiz->getCreator() . '.userstats', $content);
+					file_put_contents(self::$userStatFilePath . $quiz->getCreator() . self::$userStatSuffix, $content);
 				} else {
 					throw new Exception("Something went wrong!");
 				}
 		}
 	}
+
+	/**
+	* A function to update a user's stats with results for a quiz they have taken.
+	* @param $result the result of a quiz taken.
+	* @return null.
+	**/
 
 	public function updateUserStats(Result $result) {
 		// First check for a user stat file (and related directory). If it doesn't exist we'll need to create it
@@ -221,7 +295,7 @@ class QuizDAL {
     		mkdir(self::$userStatFilePath, 0777, true);
 		}
 
-		if (!file_exists(self::$userStatFilePath . $result->getUserName() . '.userstats')) {
+		if (!file_exists(self::$userStatFilePath . $result->getUserName() . self::$userStatSuffix)) {
 			$user = new LoggedInUser($result->getUserName());
 			$userStats = new UserStats($user);
 
@@ -229,11 +303,11 @@ class QuizDAL {
 
 			$content = serialize($userStats);
 
-			file_put_contents(self::$userStatFilePath . $result->getUserName() . '.userstats', $content);
+			file_put_contents(self::$userStatFilePath . $result->getUserName() . self::$userStatSuffix, $content);
 		} else {
 			// If it already exists, we just need to update the file
 			try {
-					$fileContent = file_get_contents(self::$userStatFilePath . $result->getUserName() . '.userStats');
+					$fileContent = file_get_contents(self::$userStatFilePath . $result->getUserName() . self::$userStatSuffix);
 				} catch (Exception $e) {
 					// No file found
 					throw new Exception("No Such Quiz File Exists!");
@@ -243,7 +317,7 @@ class QuizDAL {
 					$userStats->addResult($result);
 					$content = serialize($userStats);
 
-					file_put_contents(self::$userStatFilePath . $result->getUserName() . '.userstats', $content);
+					file_put_contents(self::$userStatFilePath . $result->getUserName() . self::$userStatSuffix, $content);
 				} else {
 					throw new Exception("Something went wrong!");
 				}

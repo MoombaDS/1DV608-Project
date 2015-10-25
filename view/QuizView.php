@@ -1,5 +1,10 @@
 <?php
 
+/**
+* A view class for displaying quizzes, quiz stats, and for taking them.
+*
+**/
+
 class QuizView {
 	private $quizModel;
 	private static $quizViewString = "quiz";
@@ -12,6 +17,12 @@ class QuizView {
 		assert(!is_null($quizModel));
 		$this->quizModel = $quizModel;
 	}
+
+	/**
+	* Render the specifed quiz.
+	* @param $quizName the name of the quiz to render.
+	* @return null but writes to standard output.
+	**/
 
 	public function render($quizName) {
 		if ($this->quizModel->quizExistsWithName($quizName)) {
@@ -29,7 +40,7 @@ class QuizView {
 		    		<ul>
 		    	';
 		    	foreach ($quizStats->getAllQuizResults() as $result) {
-		    		echo '		<li><a href ="/?user='. $result->getUserName() . '">' . $result->getUserName() . '</a> scored ' . $result->getScore() . ' out of ' . $this->quizModel->getQuiz($quizName)->getQuestionCount() . '</li>
+		    		echo '		<li><a href ="?user='. $result->getUserName() . '">' . $result->getUserName() . '</a> scored ' . $result->getScore() . ' out of ' . $this->quizModel->getQuiz($quizName)->getQuestionCount() . '</li>
 		    		';
 		    	}
 		    	echo '</ul>';
@@ -42,7 +53,7 @@ class QuizView {
 
 		    echo '
 		          <div class="container">
-		          <p>Return to <a href="/">home</a>?</p>
+		          <p>Return to <a href="?">home</a>?</p>
 		          </div>
 		         </body>
 		      </html>
@@ -51,13 +62,19 @@ class QuizView {
 		    echo '
 		          <h1>No such quiz exists!</h1>
 		          <div class="container">
-		              <p>Return to <a href="/">home</a>?</p>
+		              <p>Return to <a href="?">home</a>?</p>
 		          </div>
 		         </body>
 		      </html>
 		    ';
 		}
 	}
+
+	/**
+	* Render the questions for the specified quiz.
+	* @param $quizName the name of the Quiz.
+	* @return null but writes to standard output.
+	**/
 
 	public function renderQuizQuestions($quizName) {
 		echo '
@@ -68,17 +85,29 @@ class QuizView {
 	    ';
 	}
 
+	/**
+	* Render the user's results for the quiz.
+	* @param $result the Result object to be rendered.
+	* @return null but writes to standard output.
+	**/
+
 	public function renderScore(Result $result) {
 		$quizName = $this->requestingQuiz();
 		$quiz = $this->quizModel->getQuiz($quizName);
 		echo '
 		          <h1>' . $quizName . ': Results</h1>
 	          	<p>You scored: ' . $result->getScore() . ' out of ' . $quiz->getQuestionCount() . '</p>
-	          	<p>Return to <a href="/">home</a>?</p>
+	          	<p>Return to <a href="?">home</a>?</p>
 	         </body>
 	      </html>
 	    ';
 	}
+
+	/**
+	* Create the form for taking the quiz.
+	* @param $quizName the name of the quiz being taken.
+	* @return the HTML to render the form.
+	**/
 
 	private function createQuizForm($quizName) {
 		$quiz = $this->quizModel->getQuiz($quizName);
@@ -109,12 +138,22 @@ class QuizView {
 		return $string;
 	}
 
+	/**
+	* Check for the quiz being requested by the user.
+	* @return the name of the quiz being requested or null if no quiz is being requested.
+	**/
+
 	public function requestingQuiz() {
 		if (isset($_GET[self::$quizViewString])) {
 			return $_GET[self::$quizViewString];
 		}
 		return null;
 	}
+
+	/**
+	* Check if the user has started a quiz.
+	* @return true if they have, false if not.
+	**/
 
 	public function startedQuiz() {
 		if (isset($_POST[self::$startQuiz])) {
@@ -123,12 +162,22 @@ class QuizView {
 		return false;
 	}
 
+	/**
+	* Check if the user has submitted a quiz.
+	* @return true if they have, false if not.
+	**/
+
 	public function submittedQuiz() {
 		if (isset($_POST[self::$submittedQuiz])) {
 			return true;
 		}
 		return false;
 	}
+
+	/**
+	* Retreive the answers submitted by the user.
+	* @return an array containing the answers or null if no answers exist.
+	**/
 
 	public function getAnswers() {
 		if (isset($_POST[self::$submittedQuiz])) {
@@ -150,6 +199,11 @@ class QuizView {
 		}
 		return null;
 	}
+
+	/**
+	* Generate the "begin" button for the quiz.
+	* @return the HTML code for the begin button.
+	**/
 
 	private function generateBeginButtonHTML() {
 		return '

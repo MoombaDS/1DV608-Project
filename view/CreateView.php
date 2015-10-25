@@ -1,5 +1,10 @@
 <?php
 
+/**
+* A view class for display during Quiz creation.
+*
+**/
+
 class CreateView {
 	private static $createString = "create";
 
@@ -27,6 +32,11 @@ class CreateView {
 		$this->quizModel = $quizModel;
 	}
 
+	/**
+	* Render the quiz creation form.
+	* @return null but writes to standard output.
+	**/
+
 	public function render() {
 	    echo '
 	    	  <h1>Create New Quiz</h1>
@@ -36,12 +46,22 @@ class CreateView {
 	    ';
 	}
 
+	/**
+	* Check if the user wants to create a quiz by looking at the GET values.
+	* @return true if the user wants to create a quiz, false otherwise.
+	**/
+
 	public function wantsToCreate() {
 		if (isset($_GET[self::$createString])) {
 			return true;
 		}
 		return false;
 	}
+
+	/**
+	* Check if the user has submitted the first part of the creation form.
+	* @return true if they have, false otherwise.
+	**/
 
 	public function submittedInitialInfo() {
 		if (isset($_POST[self::$submitInitial])) {
@@ -50,12 +70,22 @@ class CreateView {
 		return false;
 	}
 
+	/**
+	* Check if the user has submitted the second part of the creation form.
+	* @return true if they have, false otherwise.
+	**/
+
 	public function submittedQuestions() {
 		if (isset($_POST[self::$submitQuestions])) {
 			return true;
 		}
 		return false;
 	}
+
+	/**
+	* Create and display the quiz creation form.
+	* @return the HTML code for displaying the form.
+	**/
 
 	public function createForm() {
 		$canContinue = false;
@@ -104,7 +134,7 @@ class CreateView {
 			// Check to see if the quiz has already been created during this session (meaning that this is a POST resubmission)
 			if ($this->currentQuiz->validateQuiz()) {
 				return '
-				<p>Quiz successfully created! You can access it <a href="/?quiz=' . $this->currentQuiz->getName() . '">here</a>!</p>
+				<p>Quiz successfully created! You can access it <a href="?quiz=' . $this->currentQuiz->getName() . '">here</a>!</p>
 				';
 			}
 
@@ -201,12 +231,17 @@ class CreateView {
 
 			// Provide the user with a link to the Quiz Stat page!
 			return '
-				<p>Quiz successfully created! You can access it <a href="/?quiz=' . $this->currentQuiz->getName() . '">here</a>!</p>
+				<p>Quiz successfully created! You can access it <a href="?quiz=' . $this->currentQuiz->getName() . '">here</a>!</p>
 			';
 			
 
 		}
 	}
+
+	/**
+	* Check for and retreive the created quiz.
+	* @return null if no quiz has been created yet, the Quiz object if it has.
+	**/
 
 	public function checkForCompletedQuiz() {
 		if (!is_null($this->currentQuiz)) {
